@@ -1,8 +1,6 @@
-import java.util.concurrent.Semaphore;
 
 public class Chopstick {
 	private int ID;
- 	private Semaphore semaphore = new Semaphore(1, true);
 
 
 	Chopstick(int ID) {
@@ -35,14 +33,12 @@ public class Chopstick {
             wait();
         }
         isTaken = true;
-		semaphore.acquire();
 		return isTaken;				
     }
 
     public synchronized Boolean release() {
         isTaken = false;
         notify();
-		semaphore.release();
 		return !isTaken;
     }
 	    
