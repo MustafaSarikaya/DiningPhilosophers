@@ -8,7 +8,6 @@ public class Philosopher extends Thread {
 	final int timeThink_max = 5000;
 	final int timeNextFork = 100;
 	final int timeEat_max = 5000;
-	private Semaphore semaphore;
 
 	
 	Philosopher(int ID, GraphicTable table, Chopstick left, Chopstick right) {
@@ -17,7 +16,6 @@ public class Philosopher extends Thread {
 		this.left = left;
 		this.right = right;
 		setName("Philosopher "+ID);
-		this.semaphore = new Semaphore(4, true);
 	}
 	
 	public void run() {
@@ -40,9 +38,7 @@ public class Philosopher extends Thread {
 				// Tell the GUI I am hungry...
 				table.isHungry(ID);
 				
-				semaphore.acquire();
 				getInLine();
-				semaphore.release();
 			} 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
