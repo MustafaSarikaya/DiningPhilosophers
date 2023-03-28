@@ -41,7 +41,11 @@ public class Philosopher extends Thread {
 				table.isHungry(ID);
 				
 				semaphore.acquire();
-				getInLine();
+				if (this.ID % 2 == 1) {
+					getInLineOdd();
+				} else {
+					getInLineEven();
+				} 
 				semaphore.release();
 			} 
 		} catch (InterruptedException e) {
@@ -49,17 +53,52 @@ public class Philosopher extends Thread {
 		}
 	}
 
-	private void getInLine() throws InterruptedException {
+	private void getInLineEven() throws InterruptedException {
+		try {
+			// Let's try to get the right chopstick
+			System.out.println(getName()+" wants left chopstick");
+			if(right.take()) {
+				// Tell the GUI that I took the right chopstick
+				table.takeChopstick(ID, right.getID());
+				System.out.println(getName()+" got right chopstick");
+
+				// Let's try to get the left chopstick
+				if (left.take()){
+					// Got it!
+					table.takeChopstick(ID, left.getID());
+					System.out.println(getName()+" got left chopstick");
+					
+					// I'll eat now
+					eat();
+
+					// I'll release the right chopstick
+					table.releaseChopstick(ID, left.getID());
+					left.release();
+					System.out.println(getName()+" released left chopstick");
+				}
+				// I'll release the left chopstick
+				table.releaseChopstick(ID, right.getID());
+				right.release();
+				System.out.println(getName()+" released right chopstick");
+			}
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void getInLineOdd() throws InterruptedException {
 		try {
 			// Let's try to get the left chopstick
 			System.out.println(getName()+" wants left chopstick");
-			if(left.tryAcquire(timeNextFork)) {
+			if(left.take()) {
 				// Tell the GUI that I took the left chopstick
 				table.takeChopstick(ID, left.getID());
 				System.out.println(getName()+" got left chopstick");
 
 				// Let's try to get the right chopstick
-				if (right.tryAcquire(timeNextFork)){
+				if (right.take()){
 					// Got it!
 					table.takeChopstick(ID, right.getID());
 					System.out.println(getName()+" got right chopstick");
